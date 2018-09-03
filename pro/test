@@ -1,0 +1,18 @@
+!blue 2.0
+//=============================================================================
+//
+// File:         rwserve-mysql-rest/pro/test
+// Language:     prorenata script
+// Copyright:    Joe Honton © 2018
+// License:      CC-BY-NC-ND 4.0
+// Initial date: Aug 29, 2018
+// Contents:     Run as RWSERVE plugin
+//
+//=============================================================================
+
+//
+// ---------- Run as RWSERVE plugin  ---------- 
+run {
+//	sh node --inspect-brk=165.227.11.3:9229 ../../rwserve/dbg/main.js ../../rwserve/test/fixtures/configs/plugins/mysql-rest-config   2> /dev/null
+	sh node --inspect=165.227.11.3:9229 ../../rwserve/dbg/main.js ../../rwserve/test/fixtures/configs/plugins/mysql-rest-config   2> /dev/null
+}

@@ -1,0 +1,30 @@
+!blue 2.0
+//=============================================================================
+//
+// File:         rwserve-mysql-rest/pro/exim
+// Language:     prorenata script
+// Copyright:    Joe Honton © 2018
+// License:      CC-BY-NC-ND 4.0
+// Initial date: Aug 29, 2018
+// Contents:     Convert ES6 import/export syntax to require/module syntax
+//
+//=============================================================================
+
+template {
+	eximjs 		 eximjs <source> <dest>
+}
+
+// ---------- rewrite export/import (src) ---------- 
+recurse {
+	source    '../src'
+	dest      '../dbg'
+	overwrite older
+	exec      eximjs
+}
+
+// ---------- look for cruft in dbg compared to original src ---------- 
+compare {
+	source    '../dbg'
+	dest      '../src'
+}
+

@@ -1,0 +1,31 @@
+
+curl -X GET https://d7.readwritetools.com:7443/api/customers
+curl -X GET "https://d7.readwritetools.com:7443/api?table=customers"
+
+curl -X GET https://d7.readwritetools.com:7443/api/customers?columns=%5B%22email_address%22%2C%22schema_number%22%5D			// ["email_address","schema_number"]
+curl -X GET https://d7.readwritetools.com:7443/api/customers?columns=%5B%22count%28%2A%29%20AS%20cnt%22%5D						// ["count(*) AS cnt"]
+
+curl -X GET https://d7.readwritetools.com:7443/api/customers?where=%5B%22oid%22%2C%221%22%5D    								// ["oid","1"]
+curl -X GET https://d7.readwritetools.com:7443/api/customers?where=%5B%22email_address%22%2C%22LIKE%22%2C%22joe01%25%22%5D    	// ["email_address","LIKE","joe01%"]
+curl -X GET https://d7.readwritetools.com:7443/api/customers?where=%5B%5B%22oid%22%2C%22%3E%22%2C%2210%22%2C%22AND%22%5D%2C%5B%22oid%22%2C%22%3C%22%2C%2220%22%5D%5D    // [["oid",">","10","AND"],["oid","<","20"]]
+
+curl -X GET https://d7.readwritetools.com:7443/api/customers?orderby=%22schema_number%22										// "schema_number"
+curl -X GET https://d7.readwritetools.com:7443/api/customers?orderby=%22email_address%20ASC%22									// "email_address ASC"
+curl -X GET https://d7.readwritetools.com:7443/api/customers?orderby=%5B%22schema_number%20DESC%22%2C%22oid%20ASC%22%5D			// ["schema_number DESC","oid ASC"]
+
+curl -X GET https://d7.readwritetools.com:7443/api/customers?limit=10		
+curl -X GET https://d7.readwritetools.com:7443/api/customers?limit=4&offset=0
+curl -X GET https://d7.readwritetools.com:7443/api/customers?limit=4&offset=2
+
+curl -X GET https://d7.readwritetools.com:7443/api?table=customers -H accept-encoding:gzip
+
+curl -X PUT https://d7.readwritetools.com:7443/api/customers       -H content-length:64 -H content-type:application/json -d '{"customer_number": "CN001", "email_address": "joe@example.com"}'
+curl -X PUT https://d7.readwritetools.com:7443/api?table=customers -H content-length:64 -H content-type:application/json -d '{"customer_number": "CN001", "email_address": "joe@example.com"}'
+
+curl -X PATCH https://d7.readwritetools.com:7443/api/customers?where=%5B%22oid%22%2C%223%22%5D -H content-length:64 -H content-type:application/json -d '{"customer_number": "CN001", "email_address": "joe@example.com"}'  // ["oid","3"]
+curl -X PATCH "https://d7.readwritetools.com:7443/api/customers?table=customers&where=%5B%22oid%22%2C%223%22%5D" -H content-length:64 -H content-type:application/json -d '{"customer_number": "CN001", "email_address": "joe@example.com"}'  // ["oid","3"]
+
+curl -X DELETE https://d7.readwritetools.com:7443/api/customers?where=%5B%22oid%22%2C%221%22%5D    								// ["oid","1"]
+curl -X DELETE "https://d7.readwritetools.com:7443/api?table=customers&where=%5B%22oid%22%2C%221%22%5D"    						// ["oid","1"]
+
+

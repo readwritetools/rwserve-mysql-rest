@@ -1,9 +1,8 @@
 {
-  "name": "rwserve-mariadb",
+  "name": "rwserve-mysql-rest",
   "version": "1.0.0",
-  "description": "RWSERVE MariaDB plugin API",
+  "description": "RWSERVE plugin MySQL/MariaDB REST API",
   "private": true,
-  "main": "./dist/main.js",
   "author": "Read Write Tools",
   "license": "see license in license.html",
   "scripts": {

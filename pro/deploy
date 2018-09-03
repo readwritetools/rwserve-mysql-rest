@@ -1,0 +1,41 @@
+!blue 2.0
+//=============================================================================
+//
+// File:         rwserve-mysql-rest/pro/deploy
+// Language:     prorenata script
+// Copyright:    Joe Honton © 2018
+// License:      CC-BY-NC-ND 4.0
+// Initial date: Aug 29, 2018
+// Contents:     Copy to dist, check for cruft, bump version, push repo
+//
+//=============================================================================
+
+
+// ---------- check make sure repo has no uncommited work ---------- 
+run {
+	sh git diff-index --quiet HEAD
+}
+
+
+// ---------- simple copy, no minify ---------- 
+copy {
+	source    '../dbg'
+	dest      '../dist'
+	overwrite older
+}
+
+// ---------- look for cruft in final dist compared to original src ---------- 
+compare {
+	source    '../dist'
+	dest      '../src'
+}
+
+// ---------- bump version and push repo to origin ---------- 
+run {
+	sh git add ../dist/.
+	sh git commit -m minify
+	sh npm version patch
+	sh git push
+	sh git push --tags
+	onerror continue
+}
