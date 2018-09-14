@@ -1,14 +1,34 @@
 {
   "name": "rwserve-mysql-rest",
-  "version": "1.0.0",
-  "description": "RWSERVE plugin MySQL/MariaDB REST API",
-  "private": true,
+  "version": "1.0.6",
+  "description": "RWSERVE plugin to implement a join-free MySQL REST API",
   "author": "Read Write Tools",
-  "license": "see license in license.html",
-  "scripts": {
-    "bump-version": "npm version patch && git push && git push --tags"
+  "license": "MIT",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/readwritetools/rwserve-mysql-rest.git"
   },
   "dependencies": {
-    "mysql2": "^1.6.1"
-  }
+    "mysql2": "^1.6.1",
+    "rwserve-plugin-sdk": "^1.0.1"
+  },
+  "scripts": {
+    "bump-version": "npm version patch && git push && git push --tags",
+    "start": "rwserve ./etc/mysql-rest-config"
+  },
+  "keywords": [
+    "rwserve",
+    "http2",
+    "plugins"
+  ],
+  "bugs": {
+    "url": "https://github.com/readwritetools/rwserve-mysql-rest/issues"
+  },
+  "homepage": "https://rwserve.readwritetools.com/plugins/rwserve-mysql-rest.blue",
+  "files": [
+    "dist",
+    "etc",
+    "img"
+  ]
 }

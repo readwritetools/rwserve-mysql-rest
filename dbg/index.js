@@ -1,43 +1,67 @@
 //=============================================================================
 //
-// File:         rwt/rwserve-mariadb/src/rwserve-mariadb.class.js
+// File:         rwserve-mysql-rest/src/index.js
 // Language:     ECMAScript 2015
-// Copyright:    Joe Honton © 2018
-// License:      CC0 1.0 Universal (CC0 1.0)
+// Copyright:    Read Write Tools © 2018
+// License:      MIT License
 // Initial date: Aug 29, 2018
 //
-// Contents:     An RWSERVE plugin to access data from MariaDB databases
+// Contents:     An RWSERVE plugin to access data from MySQL/MariaDB databases
 //
 //======================== Sample configuration ===============================
 /*
 	plugins {
-		rwserve-mariadb {
-			location `/palau/app/rwserve-mariadb/dbg/rwserve-mariadb.class.js`
+		rwserve-mysql-rest {
+			location `/palau/app/rwserve-mysql-rest/dbg/rwserve-mysql-rest.class.js`
 			config {
-				host       8.16.32.64
-				port       3306
-				user       rwserve
-				password   rwserve
-				database   registration 
+				connection {
+					host       8.16.32.64
+					port       3306
+					user       $DB-USER
+					password   $DB-PASSWORD
+					database   registration 
+				}
+				options {
+					maxrows 100
+				}
+				schema {
+					myTable1 {
+						myColumn1
+						myColumn2
+						myColumn3
+						...
+					}
+					...
+				}
 			}
 		}
 		router {
-			`/api/`  *methods=GET,PUT,PATCH,DELETE  *plugin=rwserve-mariadb
+			`/api*`  *methods=GET,PUT,PATCH,DELETE  *plugin=rwserve-mysql-rest
 		}
 	}
 */
+//========================= Sample CURL =======================================
+//
+// curl -X PUT     https://localhost:7443/api?table=customers -H content-type:application/json -d '{"customer_number": "CN001", "email_address": "friendly@mailinator.com", "account_type": "subscriber" }' -k -v
+// 
+// curl -X PATCH  "https://localhost:7443/api?table=customers&where=%5B%22account_type%22%2C%22subscriber%22%5D" -H content-type:application/json -d '{"account_type": "member" }'
+// 
+// curl -X DELETE "https://localhost:7443/api?table=customers&where=%5B%22account_type%22%2C%22expired%22%5D"
+//
+// curl -X GET    "https://localhost:7443/api?table=customers&columns=%5B%22customer_number%22%2C%20%22email_address%22%5D&where=%5B%22account_type%22%2C%22verified%22%5D&orderby=%22customer_number%20ASC%22&limit=10&offset=20"
+//
 //=============================================================================
 
-const SqlUtils = require('./sql-utils.class');
-const log = require('/usr/lib/node_modules/rwserve/dist/log.class');
-const SC = require('/usr/lib/node_modules/rwserve/dist/enum/http-status-code.enum');
+var log = require('rwserve-plugin-sdk').log;
+var SC = require('rwserve-plugin-sdk').SC;
 const mysql = require('mysql2/promise');
+var SqlUtils = require('./sql-utils.class.js');
 
-export default class RwserveMysqlRest {
+module.exports = class RwserveMysqlRest {
 
 	constructor(hostConfig) {
 		this.hostConfig 	= hostConfig;
-		this.mariadbConfig 	= hostConfig.pluginsConfig.rwserveMysqlRest;
+		this.mysqlConfig 	= hostConfig.pluginsConfig.rwserveMysqlRest;
 		this.options 		= hostConfig.pluginsConfig.rwserveMysqlRest.options; 
 		this.schema 		= hostConfig.pluginsConfig.rwserveMysqlRest.schema; 
 		
@@ -48,9 +72,9 @@ export default class RwserveMysqlRest {
 	}
 	
 	async startup() {
-		log.debug('RwserveMysqlRest', 'v1.0.0; Joe Honton © 2018; CC0 1.0 Universal'); 
+		log.debug('RwserveMysqlRest', 'v1.0.0; © 2018 Read Write Tools; MIT License'); 
 		
-		var connectionConfig = this.mariadbConfig.connection;
+		var connectionConfig = this.mysqlConfig.connection;
 		var options = {
 				host: connectionConfig.host,
 				port: connectionConfig.port,
@@ -74,7 +98,7 @@ export default class RwserveMysqlRest {
 			this.connection.destroy();
 		}
 		catch (err) {
-			log.caught(err);
+			log.error(err.message);
 		}
 	}
 	
@@ -169,6 +193,7 @@ export default class RwserveMysqlRest {
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL SELECT failed', err.message, SC.BAD_REQUEST_400);
+			workOrder.setEmptyPayload();
 			workOrder.noFurtherProcessing();
 		}
 	}
@@ -180,7 +205,7 @@ export default class RwserveMysqlRest {
 	//    Example:
 	//      {"customer_number": "CN001", "email_address": "joe@example.com"}
 	//
-	//< Sets status code 201 if the record was successfully created, and includes a payload in JSON format
+	//< Sets status code 200 if the record was successfully created, and includes a payload in JSON format
 	//  containing a single value "insertId"
 	//< Sets status code 400 when the SQL request could not be safely assembled or successfully executed
 	async create(workOrder, tableName) {
@@ -224,13 +249,14 @@ export default class RwserveMysqlRest {
 			workOrder.setOutgoingPayload(jsonPayload);
 			workOrder.addStdHeader('content-type', 'application/json');
 			workOrder.addStdHeader('content-length', jsonPayload.length);
-			workOrder.setStatusCode(SC.CREATED_201);
+			workOrder.setStatusCode(SC.OK_200);
 			workOrder.noFurtherProcessing();
 		}
 		
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL CREATE failed', err.message, SC.BAD_REQUEST_400);
+			workOrder.setEmptyPayload();
 			workOrder.noFurtherProcessing();
 		}
 	}
@@ -297,6 +323,7 @@ export default class RwserveMysqlRest {
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL UPDATE failed', err.message, SC.BAD_REQUEST_400);
+			workOrder.setEmptyPayload();
 			workOrder.noFurtherProcessing();
 		}
 	}
@@ -339,12 +366,14 @@ export default class RwserveMysqlRest {
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL DELETE failed', err.message, SC.BAD_REQUEST_400);
+			workOrder.setEmptyPayload();
 			workOrder.noFurtherProcessing();
 		}
 	}
 	
 	async unhandledMethod(workOrder, tableName) {
 		workOrder.addXHeader('rw-mysql-rest', 'unhandled method', workOrder.getMethod(), SC.BAD_REQUEST_400);
+		workOrder.setEmptyPayload();
 		workOrder.noFurtherProcessing();
 	}
 }

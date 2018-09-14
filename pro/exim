@@ -3,8 +3,8 @@
 //
 // File:         rwserve-mysql-rest/pro/exim
 // Language:     prorenata script
-// Copyright:    Joe Honton © 2018
-// License:      CC-BY-NC-ND 4.0
+// Copyright:    Read Write Tools © 2018
+// License:      MIT License
 // Initial date: Aug 29, 2018
 // Contents:     Convert ES6 import/export syntax to require/module syntax
 //
@@ -12,6 +12,7 @@
 
 template {
 	eximjs 		 eximjs <source> <dest>
+	ghfm		blue compile <source> <dest> --emit=ghfm
 }
 
 // ---------- rewrite export/import (src) ---------- 
@@ -26,5 +27,20 @@ recurse {
 compare {
 	source    '../dbg'
 	dest      '../src'
+}
+
+// ---------- copy dbg to srv/rwserve-plugin for in-place testing ---------- 
+copy {
+	source    '../dbg'
+	dest      '/srv/rwserve-plugins/node_modules/rwserve-mysql-rest/dist'
+	overwrite older
+}
+
+// ---------- Convert blue document into Github Flavored readme.md ---------- 
+recurse {
+	source '/palau/www/rwserve.readwritetools.com/plugins/rwserve-mysql-rest.blue'
+	dest   '../readme.md' 
+	overwrite older
+	exec ghfm
 }
 

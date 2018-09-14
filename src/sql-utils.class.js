@@ -9,7 +9,7 @@
 //
 //=============================================================================
 
-const log = require('/usr/lib/node_modules/rwserve/dist/log.class');
+import {log} from 'rwserve-plugin-sdk';
 
 export default class SqlUtils {
 

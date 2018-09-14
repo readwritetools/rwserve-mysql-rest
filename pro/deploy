@@ -3,8 +3,8 @@
 //
 // File:         rwserve-mysql-rest/pro/deploy
 // Language:     prorenata script
-// Copyright:    Joe Honton © 2018
-// License:      CC-BY-NC-ND 4.0
+// Copyright:    Read Write Tools © 2018
+// License:      MIT License
 // Initial date: Aug 29, 2018
 // Contents:     Copy to dist, check for cruft, bump version, push repo
 //
@@ -33,9 +33,11 @@ compare {
 // ---------- bump version and push repo to origin ---------- 
 run {
 	sh git add ../dist/.
-	sh git commit -m minify
+	sh git commit -m "deploy to dist"
 	sh npm version patch
-	sh git push
-	sh git push --tags
+	sh git push origin master
+	sh git push origin master --tags
+	sh git push github master
+	sh git push github master --tags
 	onerror continue
 }

@@ -3,8 +3,8 @@
 //
 // File:         rwserve-mysql-rest/pro/prepare
 // Language:     prorenata script
-// Copyright:    Joe Honton © 2018
-// License:      CC-BY-NC-ND 4.0
+// Copyright:    Read Write Tools © 2018
+// License:      MIT License
 // Initial date: Aug 29, 2018
 // Contents:     Install/refresh node dependencies 
 //
@@ -12,6 +12,8 @@
 
 // ---------- install node module dependencies ---------- 
 run {
-	sh git pull origin
+	sh git pull origin master
+	sh git pull github master
+	sh npm install rwserve-plugin-sdk
 	sh npm install mysql2
 }

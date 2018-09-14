@@ -1,0 +1,104 @@
+!blue 2.0
+
+$PLUGIN-PATH='/srv/rwserve-plugins/node_modules/rwserve-mysql-rest/dist/index.js'
+$PRIVATE-KEY='/etc/pki/tls/private/localhost.key'
+$CERTIFICATE='/etc/pki/tls/certs/localhost.crt'
+$DOCUMENTS-PATH='/srv/rwserve/configuration-docs'
+$DB-USER='mariadb2018'
+$DB-PASSWORD='mdb1442*sql'
+
+server {
+	ip-address   127.0.0.1
+	port         7443
+	cluster-size 1
+	
+	registration {
+		customer-number CN-UNREGISTERED
+		access-key      AK-UNREGISTERED
+	}
+
+	request {
+		methods GET,PUT,PATCH,DELETE,HEAD,OPTIONS
+
+		accept-types {
+			mime-type '*/*'
+		}
+		
+		resource-masks {
+			*pattern='/api/{tablename}?{query-string}'  *replacement='/api/?table={tablename}&{query-string}'
+			*pattern='/api/{tablename}/{oid}'           *replacement='/api/?table={tablename}&oid={oid}'
+			*pattern='/api/{tablename}'                 *replacement='/api/?table={tablename}'
+		}
+	}
+	
+	content-types {
+		html   text/html
+		json   application/json
+	}
+
+}
+
+host {
+	hostname       localhost
+	document-root  `$DOCUMENTS-PATH/public`
+	encoding-cache `$DOCUMENTS-PATH/encoding-cache`
+	dynamic-cache  `$DOCUMENTS-PATH/dynamic-cache`
+	landing-page   `index.blue`
+	tls {
+		private-key	`$PRIVATE-KEY`
+	    certificate	`$CERTIFICATE`
+	}
+
+	modules {
+		information-headers on
+		resource-masks      on
+		cache-control       on
+	}
+	
+	plugins {
+		rwserve-mysql-rest {
+			location `$PLUGIN-PATH`
+			config {
+				connection {
+					host       localhost
+					port       3306
+					user       $DB-USER
+					password   $DB-PASSWORD
+					database   registration 
+				}
+				options {
+					maxrows 100
+				}
+				schema {
+					customers {
+						oid
+						customer_number
+						email_address
+						account_type
+					}
+				}
+			}
+		}
+		router {
+			`/api*`  *methods=GET,PUT,PATCH,DELETE  *plugin=rwserve-mysql-rest
+		}	
+	}
+
+	cache-control {
+        `/api*`           *instructions='public, max-age=1800'		// 30 minutes
+    }
+    
+	logging {
+		message-type {
+			request     on
+			staging     on
+			information on
+			response    on
+			network     on
+		}
+		information {
+            default               *format='200...'
+        }
+	}
+    
+}

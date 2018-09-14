@@ -1,0 +1,23 @@
+!blue 2.0
+//=============================================================================
+//
+// File:         rwserve-mysql-rest/pro/publish
+// Language:     prorenata script
+// Copyright:    Read Write Tools © 2018
+// License:      MIT License
+// Initial date: Sep 3, 2018
+// Contents:     Publish to NPM
+//
+//=============================================================================
+
+
+// ---------- check make sure repo has no uncommited work ---------- 
+run {
+	sh git diff-index --quiet HEAD
+}
+
+
+// ----------------------- publish to NPM  ------------------------- 
+run {
+	sh npm publish ../
+}
