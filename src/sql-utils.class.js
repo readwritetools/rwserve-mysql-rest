@@ -9,7 +9,8 @@
 //
 //=============================================================================
 
-import {log} from 'rwserve-plugin-sdk';
+import {expect} from 'rwserve-plugin-sdk';
+import {log} 	from 'rwserve-plugin-sdk';
 
 export default class SqlUtils {
 
@@ -305,6 +306,14 @@ export default class SqlUtils {
 	// String values that contain APOSTROPHE '\u0027', QUOTATION-MARK '\u0022', REVERSE-SOLIDUS '\u005C', or NULL '\u0000' are escaped
 	// The entire string is wrapped in QUOTATION-MARKs.
 	static wrapValue(value) {
+		expect(value, ['String', 'Number']);
+		
+		if (value === undefined || value == null)
+			return '\u0022\u0022';
+		
+		if (value.constructor.name == 'Number')
+			value = value.toString();
+			
 		var buf = [];
 		buf.push('\u0022');
 		for (let i=0; i < value.length; i++) {

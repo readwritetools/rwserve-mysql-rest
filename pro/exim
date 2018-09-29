@@ -36,6 +36,13 @@ copy {
 	overwrite older
 }
 
+// ---------- copy package.json to srv/rwserve-plugin for in-place testing ---------- 
+copy {
+	source    '../package.json'
+	dest      '/srv/rwserve-plugins/node_modules/rwserve-mysql-rest/package.json'
+	overwrite older
+}
+
 // ---------- Convert blue document into Github Flavored readme.md ---------- 
 recurse {
 	source '/palau/www/rwserve.readwritetools.com/plugins/rwserve-mysql-rest.blue'

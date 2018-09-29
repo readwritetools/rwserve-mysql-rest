@@ -60,10 +60,10 @@ var SqlUtils = require('./sql-utils.class.js');
 module.exports = class RwserveMysqlRest {
 
 	constructor(hostConfig) {
-		this.hostConfig 	= hostConfig;
-		this.mysqlConfig 	= hostConfig.pluginsConfig.rwserveMysqlRest;
-		this.options 		= hostConfig.pluginsConfig.rwserveMysqlRest.options; 
-		this.schema 		= hostConfig.pluginsConfig.rwserveMysqlRest.schema; 
+		this.hostConfig		 = hostConfig;
+		this.mysqlRestConfig = hostConfig.pluginsConfig.rwserveMysqlRest;
+		this.options		 = hostConfig.pluginsConfig.rwserveMysqlRest.options; 
+		this.schema			 = hostConfig.pluginsConfig.rwserveMysqlRest.schema; 
 		
 		this.connection = null;
 		this.configMaxRows = (this.options !== undefined && this.options.maxrows !== undefined) ? this.options.maxrows : '100';
@@ -72,9 +72,9 @@ module.exports = class RwserveMysqlRest {
 	}
 	
 	async startup() {
-		log.debug('RwserveMysqlRest', 'v1.0.0; © 2018 Read Write Tools; MIT License'); 
+		log.debug('RwserveMysqlRest', `version ${this.mysqlRestConfig.pluginVersion}; © 2018 Read Write Tools; MIT License`); 
 		
-		var connectionConfig = this.mysqlConfig.connection;
+		var connectionConfig = this.mysqlRestConfig.connection;
 		var options = {
 				host: connectionConfig.host,
 				port: connectionConfig.port,

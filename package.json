@@ -20,7 +20,10 @@
   "keywords": [
     "rwserve",
     "http2",
-    "plugins"
+    "plugins",
+    "mysql",
+    "mariadb",
+    "rest api"
   ],
   "bugs": {
     "url": "https://github.com/readwritetools/rwserve-mysql-rest/issues"
