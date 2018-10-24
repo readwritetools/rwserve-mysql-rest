@@ -208,7 +208,7 @@ is an SQL column name, and each value is its corresponding data.
 #### Response body
 
 The response body will always have `content-type` of "application/json". For the `PUT`
-method it will contain the single value `insertID`. For the `PUT` and `PATCH` methods
+method it will contain the single value `insertID`. For the `PATCH` and `DELETE` methods
 it will contain the single value `affectedRows`. For the `GET` method it will
 contain an array of objects, each containing the columns and values requested.
 
