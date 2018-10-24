@@ -9,6 +9,7 @@
 //
 //=============================================================================
 
+var expect = require('rwserve-plugin-sdk').expect;
 var log = require('rwserve-plugin-sdk').log;
 
 module.exports = class SqlUtils {
@@ -59,7 +60,7 @@ module.exports = class SqlUtils {
 		for (let i=0; i < arr.length; i++) {
 			var columnName = arr[i];
 			if (!SqlUtils.isValidColumnName(schema, tableName, columnName))
-				throw new Error(`Unconfigured column name ${columnName} in payload`);
+				throw new Error(`Unconfigured column name ${columnName} in request body`);
 			else
 				columnsSQL.push(SqlUtils.wrapName(columnName));
 		}
@@ -83,7 +84,7 @@ module.exports = class SqlUtils {
 	static assembleSetClause(schema, tableName, json) {
 		
 		if (json.constructor.name != 'Object')
-			throw new Error(`Expecting an Object containing properties with values in the payload`);
+			throw new Error(`Expecting an Object containing properties with values in the request body`);
 
 		var pairs = [];
 		var entries = Object.entries(json);
@@ -91,7 +92,7 @@ module.exports = class SqlUtils {
 			var [columnName, columnValue] = entries[i];
 			
 			if (!SqlUtils.isValidColumnName(schema, tableName, columnName))
-				throw new Error(`Unconfigured column name ${columnName} in payload`);
+				throw new Error(`Unconfigured column name ${columnName} in request body`);
 
 			columnName = SqlUtils.wrapName(columnName);				// column_name    --> `column_name`
 			var columnValue = SqlUtils.wrapValue(columnValue);		// column's value --> "column\'s value"
@@ -305,6 +306,14 @@ module.exports = class SqlUtils {
 	// String values that contain APOSTROPHE '\u0027', QUOTATION-MARK '\u0022', REVERSE-SOLIDUS '\u005C', or NULL '\u0000' are escaped
 	// The entire string is wrapped in QUOTATION-MARKs.
 	static wrapValue(value) {
+		expect(value, ['String', 'Number']);
+		
+		if (value === undefined || value == null)
+			return '\u0022\u0022';
+		
+		if (value.constructor.name == 'Number')
+			value = value.toString();
+			
 		var buf = [];
 		buf.push('\u0022');
 		for (let i=0; i < value.length; i++) {
