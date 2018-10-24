@@ -44,11 +44,11 @@
 //
 // curl -X PUT     https://localhost:7443/api?table=customers -H content-type:application/json -d '{"customer_number": "CN001", "email_address": "friendly@mailinator.com", "account_type": "subscriber" }' -k -v
 // 
-// curl -X PATCH  "https://localhost:7443/api?table=customers&where=%5B%22account_type%22%2C%22subscriber%22%5D" -H content-type:application/json -d '{"account_type": "member" }'
+// curl -X PATCH  "https://localhost:7443/api?table=customers&where=%5B%22account_type%22%2C%22subscriber%22%5D" -H content-type:application/json -d '{"account_type": "member" }' -k
 // 
-// curl -X DELETE "https://localhost:7443/api?table=customers&where=%5B%22account_type%22%2C%22expired%22%5D"
+// curl -X DELETE "https://localhost:7443/api?table=customers&where=%5B%22account_type%22%2C%22expired%22%5D" -k
 //
-// curl -X GET    "https://localhost:7443/api?table=customers&columns=%5B%22customer_number%22%2C%20%22email_address%22%5D&where=%5B%22account_type%22%2C%22verified%22%5D&orderby=%22customer_number%20ASC%22&limit=10&offset=20"
+// curl -X GET    "https://localhost:7443/api?table=customers&columns=%5B%22customer_number%22%2C%20%22email_address%22%5D&where=%5B%22account_type%22%2C%22verified%22%5D&orderby=%22customer_number%20ASC%22&limit=10&offset=20" -k
 //
 //=============================================================================
 
@@ -138,7 +138,7 @@ module.exports = class RwserveMysqlRest {
 	}
 	
 	//-------------------------------------------------------------------------
-	//^ When the request is a GET, the payload is not needed.
+	//^ When the request is a GET, the request body is not needed.
 	//  The _parameterMap may have any of these:
 	//    'columns' is a json string containing the column names to retreive
 	//    'where' is a json string containing WHERE conditions
@@ -146,7 +146,7 @@ module.exports = class RwserveMysqlRest {
 	//    'limit' is a plain string containing an integer value for the LIMIT clause
 	//    'offset' is a plain string containing an integer value for the OFFSET clause
 	//
-	//< Sets status code 200 when the retrieval is successful, and includes a payload in JSON format
+	//< Sets status code 200 when the retrieval is successful, and includes a request body in JSON format
 	//  containing an array of objects, one for each row retrieved.
 	//< Sets status code 400 when the SQL request could not be safely assembled or successfully executed
 	async select(workOrder, tableName) {		
@@ -184,7 +184,7 @@ module.exports = class RwserveMysqlRest {
 			var [textRows, columnDefinitions] = await this.connection.execute(sqlStatement);
 			
 			var jsonPayload = JSON.stringify(textRows, null, 4);
-			workOrder.setOutgoingPayload(jsonPayload);
+			workOrder.setResponseBody(jsonPayload);
 			workOrder.addStdHeader('content-type', 'application/json');
 			workOrder.addStdHeader('content-length', jsonPayload.length);
 			workOrder.setStatusCode(SC.OK_200);
@@ -193,42 +193,42 @@ module.exports = class RwserveMysqlRest {
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL SELECT failed', err.message, SC.BAD_REQUEST_400);
-			workOrder.setEmptyPayload();
+			workOrder.setEmptyResponseBody();
 			workOrder.noFurtherProcessing();
 		}
 	}
 
 	//-------------------------------------------------------------------------
-	//^ When the HTTP method is PUT, the payload should:
+	//^ When the HTTP method is PUT, the request body should:
 	//    1) be in content-type 'application/json'
 	//    2) contain a single object whose properties are SQL column names with values.
 	//    Example:
 	//      {"customer_number": "CN001", "email_address": "joe@example.com"}
 	//
-	//< Sets status code 200 if the record was successfully created, and includes a payload in JSON format
+	//< Sets status code 200 if the record was successfully created, and includes a request body in JSON format
 	//  containing a single value "insertId"
 	//< Sets status code 400 when the SQL request could not be safely assembled or successfully executed
 	async create(workOrder, tableName) {
 		try {
 			var tableSQL = SqlUtils.wrapName(tableName);
 			
-			// make sure the payload is the correct MIME-type
+			// make sure the request body is the correct MIME-type
 			var contentType = workOrder.requestHeaders['content-type'];
 			if (workOrder.requestHeaders['content-type'] != 'application/json')
 				throw new Error(`content-type header should be application/json but was ${contentType}`);
 				
-			var jsonString = workOrder.incomingPayload;
+			var jsonString = workOrder.getRequestBody();
 			if (jsonString == '')
-				throw new Error(`empty payload`);
+				throw new Error(`empty request body`);
 
 			try {
 				var json = JSON.parse(jsonString);
 			}
 			catch (err) {
-				throw new Error(`Unable to parse json string from payload: ${err.message}`);
+				throw new Error(`Unable to parse json string from request body: ${err.message}`);
 			}
 
-			// assemble the payload's json string into column name and column value SQL strings
+			// assemble the request body's json string into column name and column value SQL strings
 			var columnsArr = Object.keys(json);
 			var valuesArr = Object.values(json);
 			var columnsSQL = SqlUtils.assembleColumns(this.schema, tableName, columnsArr);
@@ -246,7 +246,7 @@ module.exports = class RwserveMysqlRest {
 			var [resultsSetHeader, dummy] = await this.connection.execute(sqlStatement);
 			
 			var jsonPayload = `{"insertId": "${resultsSetHeader.insertId}"}`;
-			workOrder.setOutgoingPayload(jsonPayload);
+			workOrder.setResponseBody(jsonPayload);
 			workOrder.addStdHeader('content-type', 'application/json');
 			workOrder.addStdHeader('content-length', jsonPayload.length);
 			workOrder.setStatusCode(SC.OK_200);
@@ -256,13 +256,13 @@ module.exports = class RwserveMysqlRest {
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL CREATE failed', err.message, SC.BAD_REQUEST_400);
-			workOrder.setEmptyPayload();
+			workOrder.setEmptyResponseBody();
 			workOrder.noFurtherProcessing();
 		}
 	}
 	
 	//-------------------------------------------------------------------------
-	//^ When the HTTP method is PATCH, the payload should:
+	//^ When the HTTP method is PATCH, the request body should:
 	//    1) be in content-type 'application/json'
 	//    2) contain a single object whose properties are SQL column names with values.
 	//    Example:
@@ -270,30 +270,30 @@ module.exports = class RwserveMysqlRest {
 	//  The _parameterMap should have:
 	//    'where' is a json string containing WHERE conditions
 	//
-	//< Sets status code 200 if the records were successfully updated, and includes a payload in JSON format
+	//< Sets status code 200 if the records were successfully updated, and includes a request body in JSON format
 	//  containing a single value "affectedRows"
 	//< Sets status code 400 when the SQL request could not be safely assembled or successfully executed
 	async update(workOrder, tableName) {
 		try {
 			var tableSQL = SqlUtils.wrapName(tableName);
 			
-			// make sure the payload is the correct MIME-type
+			// make sure the request body is the correct MIME-type
 			var contentType = workOrder.requestHeaders['content-type'];
 			if (workOrder.requestHeaders['content-type'] != 'application/json')
 				throw new Error(`content-type header should be application/json but was ${contentType}`);
 				
-			var jsonString = workOrder.incomingPayload;
+			var jsonString = workOrder.getRequestBody();
 			if (jsonString == '')
-				throw new Error(`empty payload`);
+				throw new Error(`empty request body`);
 
 			try {
 				var json = JSON.parse(jsonString);
 			}
 			catch (err) {
-				throw new Error(`Unable to parse json string from payload: ${err.message}`);
+				throw new Error(`Unable to parse json string from request body: ${err.message}`);
 			}
 
-			// assemble the payload's json string into `column name` = "column value" SQL strings
+			// assemble the request body's json string into `column name` = "column value" SQL strings
 			var setClauseSQL = SqlUtils.assembleSetClause(this.schema, tableName, json);
 			
 			// deserialize the WHERE clause conditions and validate against the configured schema
@@ -313,7 +313,7 @@ module.exports = class RwserveMysqlRest {
 			var [resultsSetHeader, dummy] = await this.connection.execute(sqlStatement);
 			
 			var jsonPayload = `{"affectedRows": "${resultsSetHeader.affectedRows}"}`;
-			workOrder.setOutgoingPayload(jsonPayload);
+			workOrder.setResponseBody(jsonPayload);
 			workOrder.addStdHeader('content-type', 'application/json');
 			workOrder.addStdHeader('content-length', jsonPayload.length);
 			workOrder.setStatusCode(SC.OK_200);
@@ -323,17 +323,17 @@ module.exports = class RwserveMysqlRest {
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL UPDATE failed', err.message, SC.BAD_REQUEST_400);
-			workOrder.setEmptyPayload();
+			workOrder.setEmptyResponseBody();
 			workOrder.noFurtherProcessing();
 		}
 	}
 
 	//-------------------------------------------------------------------------
-	//^ When the HTTP method is DELETE, the payload is not needed.
+	//^ When the HTTP method is DELETE, the request body is not needed.
 	//  The _parameterMap should have:
 	//    'where' is a json string containing WHERE conditions
 	//
-	//< Sets status code 200 if the records were successfully deleted, and includes a payload in JSON format
+	//< Sets status code 200 if the records were successfully deleted, and includes a request body in JSON format
 	//  containing a single value "affectedRows"
 	//< Sets status code 400 when the SQL request could not be safely assembled or successfully executed
 	async delete(workOrder, tableName) {
@@ -356,7 +356,7 @@ module.exports = class RwserveMysqlRest {
 			var [resultsSetHeader, dummy] = await this.connection.execute(sqlStatement);
 			
 			var jsonPayload = `{"affectedRows": "${resultsSetHeader.affectedRows}"}`;
-			workOrder.setOutgoingPayload(jsonPayload);
+			workOrder.setResponseBody(jsonPayload);
 			workOrder.addStdHeader('content-type', 'application/json');
 			workOrder.addStdHeader('content-length', jsonPayload.length);
 			workOrder.setStatusCode(SC.OK_200);
@@ -366,14 +366,14 @@ module.exports = class RwserveMysqlRest {
 		// catch errors thrown by the various parts assemblers, and by SQL execute
 		catch (err) {
 			workOrder.addXHeader('rw-mysql-rest', 'SQL DELETE failed', err.message, SC.BAD_REQUEST_400);
-			workOrder.setEmptyPayload();
+			workOrder.setEmptyResponseBody();
 			workOrder.noFurtherProcessing();
 		}
 	}
 	
 	async unhandledMethod(workOrder, tableName) {
 		workOrder.addXHeader('rw-mysql-rest', 'unhandled method', workOrder.getMethod(), SC.BAD_REQUEST_400);
-		workOrder.setEmptyPayload();
+		workOrder.setEmptyResponseBody();
 		workOrder.noFurtherProcessing();
 	}
 }

@@ -60,7 +60,7 @@ module.exports = class SqlUtils {
 		for (let i=0; i < arr.length; i++) {
 			var columnName = arr[i];
 			if (!SqlUtils.isValidColumnName(schema, tableName, columnName))
-				throw new Error(`Unconfigured column name ${columnName} in payload`);
+				throw new Error(`Unconfigured column name ${columnName} in request body`);
 			else
 				columnsSQL.push(SqlUtils.wrapName(columnName));
 		}
@@ -84,7 +84,7 @@ module.exports = class SqlUtils {
 	static assembleSetClause(schema, tableName, json) {
 		
 		if (json.constructor.name != 'Object')
-			throw new Error(`Expecting an Object containing properties with values in the payload`);
+			throw new Error(`Expecting an Object containing properties with values in the request body`);
 
 		var pairs = [];
 		var entries = Object.entries(json);
@@ -92,7 +92,7 @@ module.exports = class SqlUtils {
 			var [columnName, columnValue] = entries[i];
 			
 			if (!SqlUtils.isValidColumnName(schema, tableName, columnName))
-				throw new Error(`Unconfigured column name ${columnName} in payload`);
+				throw new Error(`Unconfigured column name ${columnName} in request body`);
 
 			columnName = SqlUtils.wrapName(columnName);				// column_name    --> `column_name`
 			var columnValue = SqlUtils.wrapValue(columnValue);		// column's value --> "column\'s value"
