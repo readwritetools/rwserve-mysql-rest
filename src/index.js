@@ -65,7 +65,7 @@ export default class RwserveMysqlRest {
 		this.options		 = hostConfig.pluginsConfig.rwserveMysqlRest.options; 
 		this.schema			 = hostConfig.pluginsConfig.rwserveMysqlRest.schema; 
 		
-		this.connection = null;
+		this.pool = null;
 		this.configMaxRows = (this.options !== undefined && this.options.maxrows !== undefined) ? this.options.maxrows : '100';
 		
     	Object.seal(this);
@@ -80,11 +80,14 @@ export default class RwserveMysqlRest {
 				port: connectionConfig.port,
 				user: connectionConfig.user,
 				password: connectionConfig.password,
-				database: connectionConfig.database
+				database: connectionConfig.database,				
+				waitForConnections: true,
+				connectionLimit: 10,
+				queueLimit: 0
 		};
 		
 		try {
-			this.connection = await mysql.createConnection(options);
+			this.pool = await mysql.createPool(options);
 		}
 		catch (err) {
 			log.error(`Unable to connect to database ${err.message}`);
@@ -95,7 +98,7 @@ export default class RwserveMysqlRest {
 	async shutdown() {
 		log.debug('RwserveMysqlRest', `Shutting down ${this.hostConfig.hostname}`);
 		try {
-			this.connection.destroy();
+			this.pool.end();
 		}
 		catch (err) {
 			log.error(err.message);
@@ -181,7 +184,7 @@ export default class RwserveMysqlRest {
 			sqlParts.push(limitSQL);
 			var sqlStatement = sqlParts.join(' ');
 			
-			var [textRows, columnDefinitions] = await this.connection.execute(sqlStatement);
+			var [textRows, columnDefinitions] = await this.pool.execute(sqlStatement);
 			
 			var jsonPayload = JSON.stringify(textRows, null, 4);
 			workOrder.setResponseBody(jsonPayload);
@@ -243,7 +246,7 @@ export default class RwserveMysqlRest {
 			sqlParts.push(valuesSQL);
 			var sqlStatement = sqlParts.join(' ');
 			
-			var [resultsSetHeader, dummy] = await this.connection.execute(sqlStatement);
+			var [resultsSetHeader, dummy] = await this.pool.execute(sqlStatement);
 			
 			var jsonPayload = `{"insertId": "${resultsSetHeader.insertId}"}`;
 			workOrder.setResponseBody(jsonPayload);
@@ -310,7 +313,7 @@ export default class RwserveMysqlRest {
 			sqlParts.push(whereSQL);
 			var sqlStatement = sqlParts.join(' ');
 			
-			var [resultsSetHeader, dummy] = await this.connection.execute(sqlStatement);
+			var [resultsSetHeader, dummy] = await this.pool.execute(sqlStatement);
 			
 			var jsonPayload = `{"affectedRows": "${resultsSetHeader.affectedRows}"}`;
 			workOrder.setResponseBody(jsonPayload);
@@ -353,7 +356,7 @@ export default class RwserveMysqlRest {
 			sqlParts.push(whereSQL);
 			var sqlStatement = sqlParts.join(' ');
 			
-			var [resultsSetHeader, dummy] = await this.connection.execute(sqlStatement);
+			var [resultsSetHeader, dummy] = await this.pool.execute(sqlStatement);
 			
 			var jsonPayload = `{"affectedRows": "${resultsSetHeader.affectedRows}"}`;
 			workOrder.setResponseBody(jsonPayload);

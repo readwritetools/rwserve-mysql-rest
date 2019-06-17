@@ -1,3 +1,5 @@
+# use curl -k to bypass TLS certificate checking
+
 
 curl -X GET https://d7.readwritetools.com:7443/api/customers
 curl -X GET "https://d7.readwritetools.com:7443/api?table=customers"
