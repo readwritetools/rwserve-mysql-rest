@@ -1,6 +1,6 @@
 {
   "name": "rwserve-mysql-rest",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "RWSERVE plugin to implement a join-free MySQL REST API",
   "author": "Read Write Tools",
   "license": "MIT",
