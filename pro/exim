@@ -45,7 +45,7 @@ copy {
 
 // ---------- Convert blue document into Github Flavored readme.md ---------- 
 recurse {
-	source '/palau/www/rwserve.readwritetools.com/plugins/rwserve-mysql-rest.blue'
+	source '/palau/www/rwserve.readwritetools.com/plugins/ghfm/rwserve-mysql-rest.blue'
 	dest   '../readme.md' 
 	overwrite older
 	exec ghfm
