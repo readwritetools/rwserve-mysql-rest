@@ -23,7 +23,8 @@
     "plugins",
     "mysql",
     "mariadb",
-    "rest api"
+    "rest api",
+    "readwritetools"
   ],
   "bugs": {
     "url": "https://github.com/readwritetools/rwserve-mysql-rest/issues"
