@@ -1,0 +1,20 @@
+!blue 2.0
+/*=============================================================================
+//
+// File:         rwserve-mysql-rest/pro/build
+// Language:     prorenata script
+// Copyright:    Read Write Tools © 2018
+// License:      MIT License
+// Initial date: Aug 29, 2018
+// Contents:     life cycle
+//
+=============================================================================*/
+
+run {
+//	sh renata prepare			// install node module dependencies
+	sh renata exim				// convert any modified .js from src --> dbg AND from dbg --> /srv/rwserve-plugins/node_modules/rwserve-brute-force/dist
+	sh renata test				// simple call to ../../app/rwserve/dbg/main.js
+//	sh renata readme			// Convert story to markdown, and copy from hub.readwritetools.com
+//	sh renata deploy			// copy to dist, check for cruft, bump version, push repo
+//  sh renata publish			// publish to NPM
+}

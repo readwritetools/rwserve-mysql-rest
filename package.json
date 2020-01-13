@@ -10,8 +10,8 @@
     "url": "https://github.com/readwritetools/rwserve-mysql-rest.git"
   },
   "dependencies": {
-    "mysql2": "^1.6.5",
-    "rwserve-plugin-sdk": "^1.0.3"
+    "mysql2": "^1.7.0",
+    "rwserve-plugin-sdk": "^1.0.7"
   },
   "scripts": {
     "bump-version": "npm version patch && git push && git push --tags",

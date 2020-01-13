@@ -11,9 +11,10 @@
 =============================================================================*/
 
 run {
-//	sh renata prepare			// install node module dependencies
+	sh renata prepare			// install node module dependencies
 	sh renata exim				// convert any modified .js from src --> dbg AND from dbg --> /srv/rwserve-plugins/node_modules/rwserve-brute-force/dist
-	sh renata test				// simple call to ../../app/rwserve/dbg/main.js
-//	sh renata deploy			// copy to dist, check for cruft, bump version, push repo
-//  sh publish					// publish to NPM
+	// sh renata test			// simple call to ../../app/rwserve/dbg/main.js
+	sh renata readme			// Convert story to markdown, and copy from hub.readwritetools.com
+	sh renata deploy			// copy to dist, check for cruft, bump version, push repo
+	sh renata publish			// publish to NPM
 }

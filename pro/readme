@@ -1,0 +1,17 @@
+!blue 2.0
+//=============================================================================
+//
+// File:         rwserve-mysql-rest/pro/readme
+// Language:     prorenata script
+// Copyright:    Read Write Tools © 2020
+// License:      MIT License
+// Initial date: Jan 12, 2020
+// Contents:     Convert story to markdown, and copy from hub.readwritetools.com
+//
+//=============================================================================
+
+// ---------- compile .blue into .md and copy from hub.readwritetools.com ---------- 
+run {
+	sh ssh nk024 blue compile /srv/readwritetools.com/hub/public/plugins/ghfm/mysql-rest.blue /srv/readwritetools.com/hub/public/plugins/ghfm/mysql-rest.md --emit=ghfm
+	sh rsync root@nk024:/srv/readwritetools.com/hub/public/plugins/ghfm/mysql-rest.md ../readme.md
+}

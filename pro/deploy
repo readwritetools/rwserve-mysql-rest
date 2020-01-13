@@ -10,13 +10,6 @@
 //
 //=============================================================================
 
-
-// ---------- check make sure repo has no uncommited work ---------- 
-run {
-	sh git diff-index --quiet HEAD
-}
-
-
 // ---------- simple copy, no minify ---------- 
 copy {
 	source    '../dbg'
@@ -32,7 +25,7 @@ compare {
 
 // ---------- bump version and push repo to origin ---------- 
 run {
-	sh git add ../dist/.
+	sh git add ../
 	sh git commit -m "deploy to dist"
 	sh npm version patch
 	sh git push origin master
