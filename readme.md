@@ -457,18 +457,19 @@ web server's configuration in `/etc/rwserve/rwserve.conf` and restart it using `
 ### Prerequisites
 
 This is a plugin for the **Read Write Tools HTTP/2 Server**, which works on Linux
-platforms. Windows, MacOS and BSD are not supported.
+platforms.
 
 
 <table>
-	<tr><th>Software</th> <th>Minimum Version</th></tr>
-	<tr><td>Ubuntu</td> <td>16</td></tr>
-	<tr><td>Debian</td> <td>9</td></tr>
-	<tr><td>Fedora</td> <td>27</td></tr>
-	<tr><td>CentOS</td> <td>7.4</td></tr>
-	<tr><td>RHEL</td> <td>8</td></tr>
-	<tr><td>RWSERVE</td> <td>1.0</td></tr>
-	<tr><td>Node.js</td> <td>10.3</td></tr>
+	<tr><th>Software</th> <th>Minimum Version</th> <th>Most Recent Version</th></tr>
+	<tr><td>Ubuntu</td> 		<td>16 Xenial Xerus</td> <td>16 Xenial Xerus</td></tr>
+	<tr><td>Debian</td> 		<td>9 Stretch</td> 		<td>10 Buster</td></tr>
+	<tr><td>openSUSE</td>	<td>openSUSE 15.1</td> 	<td>openSUSE 15.1</td></tr>
+	<tr><td>Fedora</td> 		<td>Fedora 27</td> 		<td>Fedora 32</td></tr>
+	<tr><td>CentOS</td>		<td>CentOS 7.4</td>		<td>CentOS 8.1</td></tr>
+	<tr><td>RHEL</td> 		<td>RHEL 7.8</td>		<td>RHEL 8.2</td></tr>
+	<tr><td>RWSERVE</td>		<td>RWSERVE 1.0.1</td>	<td>RWSERVE 1.0.47</td></tr>
+	<tr><td>Node.js</td>		<td>Node.js 10.3</td>	<td>Node.js 12.17</td></tr>
 </table>
 
 ### Review

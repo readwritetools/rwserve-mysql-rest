@@ -12,7 +12,6 @@
 
 template {
 	eximjs 		 eximjs <source> <dest>
-	ghfm		blue compile <source> <dest> --emit=ghfm
 }
 
 // ---------- rewrite export/import (src) ---------- 
@@ -42,12 +41,3 @@ copy {
 	dest      '/srv/rwserve-plugins/node_modules/rwserve-mysql-rest/package.json'
 	overwrite older
 }
-
-// ---------- Convert blue document into Github Flavored readme.md ---------- 
-recurse {
-	source '/palau/www/rwserve.readwritetools.com/plugins/ghfm/rwserve-mysql-rest.blue'
-	dest   '../readme.md' 
-	overwrite older
-	exec ghfm
-}
-
