@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "mysql2": "^1.7.0",
-    "rwserve-plugin-sdk": "^1.0.7"
+    "rwserve-plugin-sdk": "^1.0.8"
   },
   "scripts": {
     "bump-version": "npm version patch && git push && git push --tags",

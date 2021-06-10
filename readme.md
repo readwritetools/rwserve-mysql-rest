@@ -6,10 +6,17 @@
 
 
 
+
+
+
+
+
 <figure>
 	<img src='/img/plugins/mysql-rest/rwserve-mariadb-unsplash-tobias-fischer.jpg' width='100%' />
 	<figcaption></figcaption>
 </figure>
+
+##### Open Source RWSERVE plugin
 
 # MySQL REST
 
@@ -17,7 +24,7 @@
 
 
 <address>
-<img src='/img/rwtools.png' width=80 /> by <a href='https://readwritetools.com' title='Read Write Tools'>Read Write Tools</a> <time datetime=2018-06-16>Jun 16, 2018</time></address>
+<img src='/img/48x48/rwtools.png' /> by <a href='https://readwritetools.com' title='Read Write Tools'>Read Write Tools</a> <time datetime=2018-06-16>Jun 16, 2018</time></address>
 
 
 
@@ -102,7 +109,7 @@ npm install rwserve-mysql-rest
 ### Configuration is Everything
 
 Make the software available by declaring it in the `plugins` section of your
-configuration file. For detailed instructions on how to do this, refer to the <a href='https://rwserve.readwritetools.com/plugins.blue'>plugins</a>
+configuration file. For detailed instructions on how to do this, refer to the <a href='https://rwserve.readwritetools.com/developing-plugins.blue'>plugins</a>
 documentation on the `Read Write Tools HTTP/2 Server` website.
 
 #### TL;DR
